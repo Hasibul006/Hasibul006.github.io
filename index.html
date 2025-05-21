@@ -1131,75 +1131,68 @@
     </script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const slider = document.getElementById('projectsSlider');
-            const prevBtn = document.getElementById('prevBtn');
-            const nextBtn = document.getElementById('nextBtn');
-            const dotsContainer = document.getElementById('dotsContainer');
-            
-            let currentIndex = 0;
-            let isAnimating = false;
-            const projects = document.querySelectorAll('.project-card');
-            const projectsPerView = window.innerWidth < 768 ? 1 : window.innerWidth < 1024 ? 2 : 3;
-            const totalProjects = projects.length;
-            const totalSlides = Math.ceil(totalProjects / projectsPerView);
-            
-            // Create dots
-            for (let i = 0; i < totalSlides; i++) {
-                const dot = document.createElement('button');
-                dot.classList.add('w-3', 'h-3', 'rounded-full', 'bg-gray-700', 'hover:bg-blue-500', 'transition');
-                dot.addEventListener('click', () => !isAnimating && goToSlide(i));
-                dotsContainer.appendChild(dot);
-            }
-            
-            // Update dots
-            function updateDots() {
-                const dots = dotsContainer.querySelectorAll('button');
-                dots.forEach((dot, index) => {
-                    dot.classList.toggle('bg-blue-500', index === currentIndex);
-                    dot.classList.toggle('bg-gray-700', index !== currentIndex);
-                });
-            }
-            
-            // Go to specific slide
-            function goToSlide(index) {
-                isAnimating = true;
-                currentIndex = index;
-                const translateX = -currentIndex * 100;
-                slider.style.transform = `translateX(${translateX}%)`;
-                updateDots();
-                
-                setTimeout(() => {
-                    isAnimating = false;
-                }, 600); // Matches the CSS transition duration
-            }
-            
-            // Next slide
-            nextBtn.addEventListener('click', () => {
-                if (isAnimating) return;
-                if (currentIndex < totalSlides - 1) {
-                    currentIndex++;
-                } else {
-                    currentIndex = 0;
-                }
-                goToSlide(currentIndex);
+    document.addEventListener('DOMContentLoaded', function () {
+        const slider = document.getElementById('projectsSlider');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const dotsContainer = document.getElementById('dotsContainer');
+
+        let currentIndex = 0;
+        let isAnimating = false;
+        const projects = document.querySelectorAll('.project-card');
+        const totalProjects = projects.length;
+
+        // Determine how many cards should be visible at once
+        const projectsPerView = window.innerWidth < 768 ? 1 : window.innerWidth < 1024 ? 2 : 3;
+
+        // Scroll one card at a time, stop before showing empty space
+        const totalSlides = totalProjects - projectsPerView + 1;
+
+        // Create correct number of dots
+        for (let i = 0; i < totalSlides; i++) {
+            const dot = document.createElement('button');
+            dot.classList.add('w-3', 'h-3', 'rounded-full', 'bg-gray-700', 'hover:bg-blue-500', 'transition');
+            dot.addEventListener('click', () => !isAnimating && goToSlide(i));
+            dotsContainer.appendChild(dot);
+        }
+
+        function updateDots() {
+            const dots = dotsContainer.querySelectorAll('button');
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('bg-blue-500', index === currentIndex);
+                dot.classList.toggle('bg-gray-700', index !== currentIndex);
             });
-            
-            // Previous slide
-            prevBtn.addEventListener('click', () => {
-                if (isAnimating) return;
-                if (currentIndex > 0) {
-                    currentIndex--;
-                } else {
-                    currentIndex = totalSlides - 1;
-                }
-                goToSlide(currentIndex);
-            });
-            
-            // Initialize
+        }
+
+        function goToSlide(index) {
+            isAnimating = true;
+            currentIndex = index;
+            const translateX = -currentIndex * (100 / projectsPerView); // percentage shift
+            slider.style.transform = `translateX(${translateX}%)`;
             updateDots();
+
+            setTimeout(() => {
+                isAnimating = false;
+            }, 600); // match CSS transition duration
+        }
+
+        nextBtn.addEventListener('click', () => {
+            if (isAnimating) return;
+            currentIndex = (currentIndex + 1) % totalSlides;
+            goToSlide(currentIndex);
         });
+
+        prevBtn.addEventListener('click', () => {
+            if (isAnimating) return;
+            currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+            goToSlide(currentIndex);
+        });
+
+        updateDots();
+    });
     </script>
+
+
 
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
 
